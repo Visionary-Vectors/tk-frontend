@@ -7,9 +7,9 @@ function App() {
 
   return (
     <>
-      <h1>
-        HEllo
-      </h1>
+      <div className='flex flex-col justify-center items-center min-h-screen bg-red-600'>
+        HHello
+      </div>
     </>
   )
 }
