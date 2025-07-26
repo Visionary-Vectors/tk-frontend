@@ -1,5 +1,5 @@
 import { useState } from 'react'
-
+import Signup from './AuthPage'
 import './index.css'
 
 function App() {
@@ -7,9 +7,7 @@ function App() {
 
   return (
     <>
-      <h1>
-        HEllo
-      </h1>
+      <Signup/>
     </>
   )
 }
