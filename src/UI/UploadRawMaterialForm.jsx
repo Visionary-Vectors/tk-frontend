@@ -1,135 +1,134 @@
 import React, { useState } from "react";
 
-const UploadRawMaterialForm = ({ onUploadSuccess }) => {
-  const [formData, setFormData] = useState({
-    raw_material_name: "",
+const UploadRawMaterialForm = ({ onUpload }) => {
+  const supplierId = localStorage.getItem("user_id"); // Get supplier ID from local storage
+
+  const [form, setForm] = useState({
+    name: "",
     raw_material_quantity: "",
     unit: "",
     raw_material_price: "",
-    rm_pictures: null,
+    image: null,
   });
 
-  const [message, setMessage] = useState("");
-  const supplierId = localStorage.getItem("user_id");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    setForm((prev) => ({ ...prev, image: e.target.files[0] }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!supplierId) {
-      setMessage("❌ Supplier ID not found.");
-      return;
-    }
+    setLoading(true);
+    setError("");
 
-    setMessage("Uploading...");
-
-    const uploadData = new FormData();
-    for (const key in formData) {
-      uploadData.append(key, formData[key]);
-    }
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("raw_material_quantity", form.raw_material_quantity);
+    formData.append("unit", form.unit);
+    formData.append("raw_material_price", form.raw_material_price);
+    formData.append("image", form.image);
 
     try {
+      console.log(formData);
       const res = await fetch(
         `https://tk-backend-n9dr.onrender.com/api/supplier/${supplierId}/uploadRawMaterials`,
         {
           method: "POST",
-          body: uploadData,
+          body: formData,
         }
       );
 
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage("✅ Uploaded successfully!");
-        onUploadSuccess(data.rawMaterial);
-        // Clear the form
-        setFormData({
-          raw_material_name: "",
-          raw_material_quantity: "",
-          unit: "",
-          raw_material_price: "",
-          rm_pictures: null,
-        });
-      } else {
-        setMessage(data.message || "❌ Upload failed.");
+      if (!res.ok) {
+        const text = await res.text(); // to debug non-JSON error responses
+        throw new Error(text || "Upload failed");
       }
+
+      const result = await res.json();
+      console.log("✅ Upload success:", result);
+      
+      setForm({
+        name: "",
+        raw_material_quantity: "",
+        unit: "",
+        raw_material_price: "",
+        image: null,
+      });
+      onUpload(); 
+      // refresh materials
     } catch (err) {
-      console.error("Upload error:", err);
-      setMessage("❌ Network error.");
+      console.error("❌ Upload error:", err);
+      setError("Failed to upload material. Check inputs and try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white shadow-md p-6 rounded-lg max-w-md">
-      <h2 className="text-lg font-semibold mb-4">Add Raw Material</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded shadow-sm bg-white">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           type="text"
-          name="raw_material_name"
-          value={formData.raw_material_name}
+          name="name"
+          placeholder="Raw Material Name"
+          value={form.name}
           onChange={handleChange}
-          placeholder="Material Name"
-          className="w-full border p-2 rounded"
           required
+          className="border p-2 rounded w-full"
         />
-
         <input
           type="number"
           name="raw_material_quantity"
-          value={formData.raw_material_quantity}
-          onChange={handleChange}
           placeholder="Quantity"
-          className="w-full border p-2 rounded"
+          value={form.raw_material_quantity}
+          onChange={handleChange}
           required
+          className="border p-2 rounded w-full"
         />
-
         <input
           type="text"
           name="unit"
-          value={formData.unit}
+          placeholder="Unit (e.g. kg, lts)"
+          value={form.unit}
           onChange={handleChange}
-          placeholder="Unit (e.g., kg)"
-          className="w-full border p-2 rounded"
           required
+          className="border p-2 rounded w-full"
         />
-
         <input
           type="number"
           name="raw_material_price"
-          value={formData.raw_material_price}
+          placeholder="Price"
+          value={form.raw_material_price}
           onChange={handleChange}
-          placeholder="Price (₹)"
-          className="w-full border p-2 rounded"
           required
+          className="border p-2 rounded w-full"
         />
-
         <input
           type="file"
-          name="rm_pictures"
-          onChange={handleChange}
+          name="image"
           accept="image/*"
-          className="w-full"
+          onChange={handleImageChange}
           required
+          className="border p-2 rounded w-full"
         />
+      </div>
 
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-        >
-          Upload
-        </button>
-      </form>
+      {error && <p className="text-red-600">{error}</p>}
 
-      {message && (
-        <p className="mt-4 text-sm text-center text-gray-700">{message}</p>
-      )}
-    </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+      >
+        {loading ? "Uploading..." : "Upload Material"}
+      </button>
+    </form>
   );
 };
 

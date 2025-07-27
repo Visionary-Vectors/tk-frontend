@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa"; // 👈 install react-icons if not already
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ const Navbar = () => {
     navigate("/");
   };
 
+  const handleProfileClick = () => {
+    navigate("/dashboard");
+  };
+
   return (
     <nav className="sticky top-0 bg-white shadow-md z-50">
       <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
@@ -26,7 +31,8 @@ const Navbar = () => {
         >
           RawMart
         </h1>
-        <ul className="flex space-x-6 text-gray-700 font-medium">
+
+        <ul className="flex space-x-6 text-gray-700 font-medium items-center">
           <li>
             <a href="#services" className="hover:text-blue-600">
               Services
@@ -43,21 +49,38 @@ const Navbar = () => {
             </a>
           </li>
           <li>
-            <a href="#" className="hover:text-blue-600">
-              🛒 Cart
-            </a>
+            <span onClick={() => navigate("/cart")} className="cursor-pointer hover:text-blue-600">
+  🛒 Cart
+</span>
           </li>
-          <li>
-            {isLoggedIn ? (
-              <button onClick={handleLogout} className="hover:text-red-600">
-                Logout
-              </button>
-            ) : (
+
+          {isLoggedIn ? (
+            <>
+              <li>
+                <button
+                  onClick={handleProfileClick}
+                  className="text-blue-600 hover:text-blue-800 text-xl"
+                  title="Go to Dashboard"
+                >
+                  <FaUserCircle size={24} />
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="hover:text-red-600"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <li>
               <button onClick={handleAuth} className="hover:text-blue-600">
                 Sign up | Log in
               </button>
-            )}
-          </li>
+            </li>
+          )}
         </ul>
       </div>
     </nav>

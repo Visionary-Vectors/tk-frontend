@@ -3,7 +3,9 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import HomePage from "../UI/Home";
 import AuthPage from "../AuthPage";
 import Dashboard from "../UI/Dashboard";
-
+import ProductPage from "../UI/ProductPage";
+import CartPage from "../UI/CartPage";
+import VendorDashboard from "../UI/VendorDashboard";
 const AppRoutes = () => {
   const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -34,6 +36,9 @@ const AppRoutes = () => {
       />
 
       <Route path="*" element={<Navigate to="/" />} />
+      <Route path="/products" element={<ProductPage />} />
+<Route path="/cart" element={<CartPage />} />
+<Route path="/vendor-dashboard" element={<VendorDashboard />} />
     </Routes>
   );
 };

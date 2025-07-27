@@ -54,11 +54,16 @@ export default function AuthPage() {
       console.log("🧾 Server response:", data);
 
       const userId = data.user_id || data.userId;
+      const role = data.user?.role || data.role;
 
       if (res.ok && userId) {
         console.log("✅ Saving user_id:", userId);
         localStorage.setItem("user_id", userId);
-        if (data.role) localStorage.setItem("role", data.role);
+        if (role) {
+          localStorage.setItem("role", role);
+          console.log("✅ Role saved:", role);
+        }
+
         setMessage(isSignup ? "✅ User created!" : "✅ Logged in!");
         setTimeout(() => navigate("/dashboard", { replace: true }), 500);
       } else {

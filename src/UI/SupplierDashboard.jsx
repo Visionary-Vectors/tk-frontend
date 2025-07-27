@@ -5,14 +5,19 @@ import RawMaterialsTable from "./RawMaterialsTable";
 const SupplierDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [materials, setMaterials] = useState([]);
+  const supplierId = localStorage.getItem("user_id"); // ✅ supplier ID
 
   useEffect(() => {
-    fetchRawMaterials();
-  }, []);
+    if (supplierId) {
+      fetchRawMaterials();
+    }
+  }, [supplierId]);
 
   const fetchRawMaterials = async () => {
     try {
-      const res = await fetch("https://tk-backend-n9dr.onrender.com/api/raw-materials");
+      const res = await fetch(
+        `https://tk-backend-n9dr.onrender.com/api/supplier/${supplierId}/rawMaterials`
+      );
       const data = await res.json();
       setMaterials(data);
     } catch (err) {
