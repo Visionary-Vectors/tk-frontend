@@ -36,7 +36,7 @@ const UploadRawMaterialForm = ({ onUploadSuccess }) => {
 
     try {
       const res = await fetch(
-        `https://tk-backend-n9dr.onrender.com/api/supplier/${supplierId}/uploadRawMaterial`,
+        `https://tk-backend-n9dr.onrender.com/api/supplier/${supplierId}/uploadRawMaterials`,
         {
           method: "POST",
           body: uploadData,
